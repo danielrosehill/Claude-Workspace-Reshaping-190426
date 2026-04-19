@@ -10,7 +10,7 @@ Legend: ⬜ pending · 🟡 in progress · ✅ complete · 🗑️ template repo
 
 | Cluster | Status | Target plugin repo | Templates absorbed | Old plugins absorbed | Notes |
 |---|---|---|---|---|---|
-| filesystem-organiser | ⬜ | `filesystem-organiser-plugin` (new) | Claude-FS-Organiser, Claude-Gdrive-Organiser | — | Tests merge pattern. |
+| filesystem-organiser | ✅ | [`filesystem-organiser-plugin`](https://github.com/danielrosehill/filesystem-organiser-plugin) | Claude-FS-Organiser, Claude-Gdrive-Organiser | — | Pilot complete. 21 commands + 1 agent promoted. Two variants (local, gdrive). `claude plugin validate` passed (warnings only: migrated commands lack YAML frontmatter — pre-existing, non-blocking). |
 
 ## Wave 1 — new plugins, single or small template count (clean creates)
 
