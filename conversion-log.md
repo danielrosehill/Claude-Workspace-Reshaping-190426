@@ -10,17 +10,17 @@ Legend: ⬜ pending · 🟡 in progress · ✅ complete · 🗑️ template repo
 
 | Cluster | Status | Target plugin repo | Templates absorbed | Old plugins absorbed | Notes |
 |---|---|---|---|---|---|
-| filesystem-organiser | ✅ | [`filesystem-organiser-plugin`](https://github.com/danielrosehill/filesystem-organiser-plugin) | Claude-FS-Organiser, Claude-Gdrive-Organiser | — | Pilot complete. 21 commands + 1 agent promoted. Two variants (local, gdrive). `claude plugin validate` passed (warnings only: migrated commands lack YAML frontmatter — pre-existing, non-blocking). |
+| filesystem-organiser | ✅ | [`Claude-Filesystem-Organiser-Plugin`](https://github.com/danielrosehill/Claude-Filesystem-Organiser-Plugin) | Claude-FS-Organiser, Claude-Gdrive-Organiser | — | Pilot complete. 21 commands + 1 agent promoted. Two variants (local, gdrive). `claude plugin validate` passed (warnings only: migrated commands lack YAML frontmatter — pre-existing, non-blocking). |
 
 ## Wave 1 — new plugins, single or small template count (clean creates)
 
 | Cluster | Status | Target plugin repo | Templates absorbed | Old plugins absorbed | Notes |
 |---|---|---|---|---|---|
-| desktop-manager | ✅ | [`desktop-manager-plugin`](https://github.com/danielrosehill/desktop-manager-plugin) | *(scaffold authored from scratch)* | — | 8 commands, flat template, no variants. Validates clean. |
-| budgeting | ✅ | [`budgeting-plugin`](https://github.com/danielrosehill/budgeting-plugin) | Claude-Budget-Workspace-Template | — | 10 commands + 6 agents. Also: `home-budget-helper-plugin` local dir is a scratch duplicate → deletion candidate. |
-| shopping | ✅ | [`shopping-plugin`](https://github.com/danielrosehill/shopping-plugin) | Claude-Israel-Shopping-Recommender-Template, Israel-Online-Shopping-Skill, Claude-Shopping-Eval-Demo | — | 26 commands. All three sources were Israel-focused — shipped `generic` variant placeholder for future regions. Daniel to confirm if "other region" template exists somewhere. |
-| ai-engineering | ✅ | [`ai-engineering-plugin`](https://github.com/danielrosehill/ai-engineering-plugin) | Prompt-Factory-Template, Prompt-Library-Template | — | 7 commands + 1 agent. System-Prompt-Factory (Streamlit app) + prompt-library-conversions (tracker) skipped — not primitive-bearing. |
-| media-library | ✅ | [`media-library-plugin`](https://github.com/danielrosehill/media-library-plugin) | Claude-Media-Library-Org-Template | — | 10 commands + 1 agent. |
+| desktop-manager | ✅ | [`Claude-Desktop-Manager-Plugin`](https://github.com/danielrosehill/Claude-Desktop-Manager-Plugin) | *(scaffold authored from scratch)* | — | 8 commands, flat template, no variants. Validates clean. |
+| budgeting | ✅ | [`Claude-Budgeting-Plugin`](https://github.com/danielrosehill/Claude-Budgeting-Plugin) | Claude-Budget-Workspace-Template | — | 10 commands + 6 agents. Also: `home-budget-helper-plugin` local dir is a scratch duplicate → deletion candidate. |
+| shopping | ✅ | [`Claude-Shopping-Plugin`](https://github.com/danielrosehill/Claude-Shopping-Plugin) | Claude-Israel-Shopping-Recommender-Template, Israel-Online-Shopping-Skill, Claude-Shopping-Eval-Demo | — | 26 commands. All three sources were Israel-focused — shipped `generic` variant placeholder for future regions. Daniel to confirm if "other region" template exists somewhere. |
+| ai-engineering | ✅ | [`Claude-AI-Engineering-Plugin`](https://github.com/danielrosehill/Claude-AI-Engineering-Plugin) | Prompt-Factory-Template, Prompt-Library-Template | — | 7 commands + 1 agent. System-Prompt-Factory (Streamlit app) + prompt-library-conversions (tracker) skipped — not primitive-bearing. |
+| media-library | ✅ | [`Claude-Media-Library-Plugin`](https://github.com/danielrosehill/Claude-Media-Library-Plugin) | Claude-Media-Library-Org-Template | — | 10 commands + 1 agent. |
 
 ## Wave 2 — new plugins, larger template counts
 
@@ -29,16 +29,16 @@ Legend: ⬜ pending · 🟡 in progress · ✅ complete · 🗑️ template repo
 | career | ⬜ | new | Career Planning, Job Search, Salary Research | — | |
 | purchasing | ⬜ | new | Purchasing Assistant, Recommendations, Rig Planner, Business Continuity | — | |
 | research-space | ⬜ | new | 12 research templates | — | |
-| audio-production | ⬜ | new | Audio Workspace, Podcast, Transcript Cleanup | — | |
-| video-production | ⬜ | new | Video Reel Org, ComfyUI, Cover Art | — | |
-| pr-media-work | ⬜ | new | Media Monitor, PR & Media, Comms Strategist | — | |
-| smart-home | ⬜ | new | Home Assistant, Snapcast, Spotify, Plex-Synology | — | |
+| audio-production | ✅ | [`Claude-Audio-Production-Plugin`](https://github.com/danielrosehill/Claude-Audio-Production-Plugin) | Claude-Audio-Workspace-Template, Claude-Podcast-Production-Template, Transcript-Cleanup-Template | — | 19 commands + 1 agent + VAD skill. 3 variants. VAD globally reachable. |
+| video-production | ✅ | [`Claude-Video-Production-Plugin`](https://github.com/danielrosehill/Claude-Video-Production-Plugin) | Claude-Video-Reel-Org-Template, Claude-ComfyUI-Workspace-Template, Claude-AI-Cover-Art-Template | — | 21 commands + 1 agent. 3 variants. |
+| pr-media-work | ✅ | [`Claude-PR-Media-Work-Plugin`](https://github.com/danielrosehill/Claude-PR-Media-Work-Plugin) | Claude-Media-Monitor, Claude-PR-And-Media-Monitoring-Workspace, Claude-Comms-Strategist-Template | — | 28 cmds + 17 agents. Media-Monitor and PR-And-Media-Monitoring are byte-identical — deduped. |
+| smart-home | ✅ | [`Claude-Smart-Home-Plugin`](https://github.com/danielrosehill/Claude-Smart-Home-Plugin) | Claude-Home-Assistant-Manager-Template, Claude-Snapcast-Maintenance-Template, Claude-Spotify-Network-Installer-Template, Plex-Synology-Management-Template | — | 47 cmds + 5 agents + 2 skills. Personal IPs (10.0.0.x) + hostnames (bedroompi, nurserypi) scrubbed. |
 | legal-investigative | ⬜ | new | 6 legal templates | — | |
 | knowledge-documentation | ⬜ | new | Resource List, Wiki, Process Docs, SOP, Experiment Report | — | |
-| content-writing | ⬜ | new | Writing Space, Blog Manager, Opinion Blog, Writing Examples, Document Templates | — | |
+| content-writing | ✅ | [`Claude-Content-Writing-Plugin`](https://github.com/danielrosehill/Claude-Content-Writing-Plugin) | Claude-Writing-Space-Template, Claude-Blog-Manager, Opinion-Blog-Template, Writing-Examples-Template, Document-Templates | — | 4 variants. |
 | personal-planning | ⬜ | new | Diary, Health, Parenting, House Search, Personal Dev, Preparedness, Therapy, Spam, Im Not Okay | — | |
 | ideation-planning | ⬜ | new | 15 ideation templates | — | |
-| debugging | ⬜ | new | Debugging Workspace, Bug Tracker | — | |
+| debugging | ✅ | [`Claude-Debugging-Plugin`](https://github.com/danielrosehill/Claude-Debugging-Plugin) | Claude-Debugging-Workspace, Bug-Tracker-Template | — | 10 commands + 2 agents. 3 variants. |
 
 ## Wave 3 — extend existing plugins (absorb companions)
 
