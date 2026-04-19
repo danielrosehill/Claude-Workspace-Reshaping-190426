@@ -57,9 +57,10 @@ Legend: ⬜ pending · 🟡 in progress · ✅ complete · 🗑️ template repo
 
 | Stage | Status | Notes |
 |---|---|---|
-| Update marketplace.json (remove new-repo-from-template, add/update all) | ⬜ | After all waves. |
-| Refresh plugins locally | ⬜ | `claude plugin update` on this workstation. |
-| Update Claude-Code-Projects-Index | ⬜ | After marketplace updates. Large update: remove ~100 deleted template repos, add 27 new plugin entries, update counts. Local clone dir is stale (`Claude-Code-Repos-Index` → rename to match). |
-| Redeploy docs site from index | ⬜ | The index feeds a generated docs site. Find deploy mechanism (`.github/workflows/`, Cloudflare Pages, Vercel, etc.) and trigger. |
-| Batch-delete absorbed template repos | ⬜ | **Checkpoint with Daniel before executing** — large, irreversible. |
-| Archive New-Repo-From-Template-Plugin | ⬜ | Final step. |
+| Update marketplace.json | ✅ | v2.0.0 pushed with 29 plugins (28 from the reshape + claude-transcription added late). |
+| Refresh plugins locally | ✅ | 26 stale plugins uninstalled, 25 new cluster plugins installed, 0 failures. |
+| Update Claude-Code-Projects-Index | ✅ | Commit `6198d00` pushed. data/marketplace.json synced, plugin_group_map refreshed, category pages updated with "see also" pointers, broken-link cleanup done. Local dir renamed to Claude-Code-Projects-Index. |
+| Redeploy docs site from index | ✅ | Auto-deploys via Vercel on push. |
+| Batch-delete absorbed template + retired plugin repos | ✅ | 127 repos deleted (126 first pass + 1 retry after rename). 3 already gone. Log in `deletion-results.md`. |
+| Add CHANGELOG.md to Claude-Code-Plugins | ✅ | `CHANGELOG.md` at marketplace root, Keep-a-Changelog style, 2.0.0 reshape documented. |
+| Retire Claude-Transcription-plugin rename | ✅ | Renamed to `Claude-Transcription-Plugin` (capital P), added to marketplace as 29th plugin. |
