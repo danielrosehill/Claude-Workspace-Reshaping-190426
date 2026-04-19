@@ -59,6 +59,7 @@ Legend: ⬜ pending · 🟡 in progress · ✅ complete · 🗑️ template repo
 |---|---|---|
 | Update marketplace.json (remove new-repo-from-template, add/update all) | ⬜ | After all waves. |
 | Refresh plugins locally | ⬜ | `claude plugin update` on this workstation. |
-| Update Claude-Code-Repos-Index | ⬜ | After marketplace updates. |
+| Update Claude-Code-Projects-Index | ⬜ | After marketplace updates. Large update: remove ~100 deleted template repos, add 27 new plugin entries, update counts. Local clone dir is stale (`Claude-Code-Repos-Index` → rename to match). |
+| Redeploy docs site from index | ⬜ | The index feeds a generated docs site. Find deploy mechanism (`.github/workflows/`, Cloudflare Pages, Vercel, etc.) and trigger. |
 | Batch-delete absorbed template repos | ⬜ | **Checkpoint with Daniel before executing** — large, irreversible. |
 | Archive New-Repo-From-Template-Plugin | ⬜ | Final step. |

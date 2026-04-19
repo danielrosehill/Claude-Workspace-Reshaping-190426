@@ -101,10 +101,14 @@ All conversions follow this sequence. Batch-run across clusters.
 1. On this workstation, `claude plugin update` (or equivalent) so the new cluster plugins are installed/refreshed.
 2. Smoke-test at least one `new-workspace` skill from `~` to confirm the VAD-style pain point is resolved.
 
-### Index update
+### Index update + docs site redeploy
 
-1. Update `~/repos/github/my-repos/Claude-Code-Repos-Index/` — remove entries for deleted template repos, add entries for new cluster plugins, update counts.
-2. Commit + push.
+1. Update [`Claude-Code-Projects-Index`](https://github.com/danielrosehill/Claude-Code-Projects-Index) (local stale clone at `~/repos/github/my-repos/Claude-Code-Repos-Index/` — rename dir to match) — substantial update:
+   - Remove entries for every deleted standalone template repo.
+   - Add entries for all 27 new/extended cluster plugins with Title-Case names and new description format.
+   - Update counts, categorization, and any screenshots/tables.
+2. Commit + push the index repo.
+3. **Redeploy the docs site** generated from the index repo (find the deployment mechanism — likely a Pages/Workers setup; check for `.github/workflows/` or a `vercel.json`/`wrangler.toml`).
 
 ### Retire New-Repo-From-Template
 
