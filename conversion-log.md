@@ -44,11 +44,11 @@ Legend: ⬜ pending · 🟡 in progress · ✅ complete · 🗑️ template repo
 
 | Cluster | Status | Target plugin repo | Templates absorbed | Old plugins absorbed | Notes |
 |---|---|---|---|---|---|
-| technical-docs | ⬜ | existing `documentation-plugin` | Environment Docs, Tech Stack, Developer Notebook | `tech-docs`, `fix-documentation` | |
-| sysadmin-homelab | ⬜ | new or existing bash-alias-manager repo | 13 sysadmin templates | `bash-alias-manager`, `bug-catcher` | |
-| dev-tools | ⬜ | new or existing repo-retrofitter repo | 8 dev templates + Claude-QA-Team orphan | `repo-retrofitter`, `make-agent-friendly`, `qa-team`, `claude-templatizer`, `claude-janitor`, `session-transfer` | QA-Team dedup lives here. |
-| workspace-foundational | ⬜ | existing `workspace-setup-plugin` | 7 foundational templates | `workspace-setup`, `new-repo-from-template` | |
-| meta-tools | ⬜ | new | — | `new-turn-hook`, `claudemd-chunker`, `mcp-command-generator`, `what-thing`, `claude-code-feedback` | |
+| technical-docs | ✅ | [`Claude-Technical-Docs-Plugin`](https://github.com/danielrosehill/Claude-Technical-Docs-Plugin) | Environment-Docs, Tech-Stack, Developer-Notebook | `tech-docs` (documentation-plugin), `fix-documentation` (Claude-Document-This) | 26 cmds + doc-writer agent, 4 variants. |
+| sysadmin-homelab | ✅ | [`Claude-Sysadmin-Homelab-Plugin`](https://github.com/danielrosehill/Claude-Sysadmin-Homelab-Plugin) | 13 sysadmin templates | `bash-alias-manager`, partial `bug-catcher` (system-level diagnose only; bug-specific → debugging) | 9 variants. Aggressive dedup. All Daniel IPs/hostnames scrubbed. |
+| dev-tools | ✅ | [`Claude-Dev-Tools-Plugin`](https://github.com/danielrosehill/Claude-Dev-Tools-Plugin) | 8 dev templates + Claude-QA-Team orphan | `repo-retrofitter`, `make-agent-friendly`, `qa-team`, `claude-templatizer`, `claude-janitor`, `session-transfer` | 10 cmds + 36 skills + 1 agent, 7 variants. QA-Team merged. |
+| workspace-foundational | ✅ | [`Claude-Workspace-Foundational-Plugin`](https://github.com/danielrosehill/Claude-Workspace-Foundational-Plugin) | 7 foundational templates | `workspace-setup`, `new-repo-from-template` | 5 cmds + 2 skills (incl `find-template`), 6 variants. |
+| meta-tools | ✅ | [`Claude-Meta-Tools-Plugin`](https://github.com/danielrosehill/Claude-Meta-Tools-Plugin) | — | `new-turn-hook`, `claudemd-chunker`, `mcp-command-generator`, `what-thing`, `claude-code-feedback` | 6 cmds + many skills. No real hooks existed (aspirational). |
 | security-compliance | ✅ | existing `security-checkup-plugin` | — | `security-checkup` | Already stable, no work. |
 | user-memory-personalization | ✅ | existing `Claude-User-Memory-plugin` | — | `claude-user-memory` | Already stable. |
 | ai-transparency-attribution | ✅ | existing `ai-attribution-plugin` | — | `ai-attribution` | Already stable. |
