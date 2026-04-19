@@ -16,11 +16,11 @@ Legend: ⬜ pending · 🟡 in progress · ✅ complete · 🗑️ template repo
 
 | Cluster | Status | Target plugin repo | Templates absorbed | Old plugins absorbed | Notes |
 |---|---|---|---|---|---|
-| desktop-manager | ⬜ | new | *(scaffold authored from scratch)* | — | User-flagged essential. |
-| budgeting | ⬜ | new | Claude Budget Workspace Template | — | |
-| shopping | ⬜ | new | Claude Israel Shopping Recommender + other | — | |
-| ai-engineering | ⬜ | new | Prompt Factory, Prompt Library | — | |
-| media-library | ⬜ | new | Claude Media Library Org Template | — | |
+| desktop-manager | ✅ | [`desktop-manager-plugin`](https://github.com/danielrosehill/desktop-manager-plugin) | *(scaffold authored from scratch)* | — | 8 commands, flat template, no variants. Validates clean. |
+| budgeting | ✅ | [`budgeting-plugin`](https://github.com/danielrosehill/budgeting-plugin) | Claude-Budget-Workspace-Template | — | 10 commands + 6 agents. Also: `home-budget-helper-plugin` local dir is a scratch duplicate → deletion candidate. |
+| shopping | ✅ | [`shopping-plugin`](https://github.com/danielrosehill/shopping-plugin) | Claude-Israel-Shopping-Recommender-Template, Israel-Online-Shopping-Skill, Claude-Shopping-Eval-Demo | — | 26 commands. All three sources were Israel-focused — shipped `generic` variant placeholder for future regions. Daniel to confirm if "other region" template exists somewhere. |
+| ai-engineering | ✅ | [`ai-engineering-plugin`](https://github.com/danielrosehill/ai-engineering-plugin) | Prompt-Factory-Template, Prompt-Library-Template | — | 7 commands + 1 agent. System-Prompt-Factory (Streamlit app) + prompt-library-conversions (tracker) skipped — not primitive-bearing. |
+| media-library | ✅ | [`media-library-plugin`](https://github.com/danielrosehill/media-library-plugin) | Claude-Media-Library-Org-Template | — | 10 commands + 1 agent. |
 
 ## Wave 2 — new plugins, larger template counts
 
