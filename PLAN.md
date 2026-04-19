@@ -1,119 +1,128 @@
-# Claude Workspace Reshaping — Task Definition
+# Claude Workspace Reshaping — Determinative Plan
 
-> Note: lightly formatted from a voice-typed transcript.
-
-## Grounding / References
-
-- **Marketplace:** https://github.com/danielrosehill/Claude-Code-Plugins
-- **Consolidation plugin to unwind:** https://github.com/danielrosehill/New-Repo-From-Template-Plugin — folded many previously-standalone plugins in as repo templates, and also absorbed many templates that were never shaped as plugins to begin with.
-
-## Background
-
-When I began using Claude Code, I felt intuitively that its main use stretched far beyond code generation. I began using it very efficiently for desktop operations, server management, etc. I realized that to support the type of workflow pattern I work around, a folder structure was still useful. A folder structure gives Claude a defined place to store outputs and gives me a defined place to provide context data. So using a combination of folders and code primitives like slash commands and subagents, I was able to define workspaces.
-
-I call these Claude spaces. An example would be Home Assistant Manager — a repository template that the user can clone, shipping with slash commands, the defined structure, and CLAUDE.md files. It's essentially a quick-start. I open-source these publicly to contribute the templates for anyone who wants to use them. In practice, I would first create my public template, and then if it was a private project, I would simply create a private repository from that public template.
-
-Over time, Claude Code has developed quickly and introduced plugins as a mechanism for bundling elements such as slash commands, subagents, and now agent skills, which are incredibly useful. I've been thinking about how to update my collection correspondingly. Plugins continue to provide a lot of use, because by having a public marketplace, I can create plugins that I can then sync onto my laptop or another computer. The only challenge is creating private templates — for that, I'd need a private marketplace.
-
-But a lot of the times where I do that, the cases where it's truly necessary are actually edge cases. More often than not, a clean mechanism to separate user data from the template is a more elegant and practical solution.
-
-My first refactoring was to create a plugin called "create new repository from a template" and nest all my templates within that. My thought was rationalization, but when trying to use my own plugins, I realized there's a deficit: I can only use that plugin to start a workspace from within the place where the skills and subagents live. I need to be using Claude within that defined part of the filesystem in order to have access to the tools. This really reduces the fluidity in the way I try to use Claude, which is maybe unconventional but works best when bypass permissions are on — the agent is free to roam the filesystem, and there's no tight binding between the current CLI position and what tools are available. The original limitation was due to trying to avoid context bloat, but that problem has been essentially overcome by more selective tool calling, rendering it unnecessary.
-
-Today, I thought of a solution that would reduce the need to maintain duplicate elements for each project. If I have a plugin like Desktop Manager that also maintains a template called Desktop Manager Workspace, I could have created a plugin that defines a skill to clone the scaffold onto the user's computer. But I realized an easier way: just ship a single plugin and include the scaffold as data, then define a skill that provisions that scaffold/template which is already bundled.
-
-Claude defines plugin data stores as an innovative mechanism — it can also use that to store user data. Given that the entire objective of many of these plugins is to provide a seamless cross-device experience with Claude, I think there is independent value in allowing the plugins to let the user define an onboarding cue where they'd like to provision or create the workspace.
-
-## Design principle: plugins are generic, data stores are personal
-
-Plugins published to the marketplace **must contain no workspace-specific context** — no Daniel-specific paths, hostnames, identifiers, or preferences. They ship only the generic behavior (skills, subagents, commands) plus a generic scaffold.
-
-The standard pattern every plugin should follow:
-
-1. **Onboarding command/skill** — first-run setup that:
-   - Asks the user where they want the data store provisioned (or accepts it as an argument).
-   - Creates the scaffold at that path.
-   - Reads `~/.claude/CLAUDE.md` (user memory) to pick up OS, locale, timezone, and other ambient facts, and personalizes the newly created workspace accordingly.
-   - Prompts for any plugin-specific facts it can't infer and writes them into the workspace's own CLAUDE.md / context files.
-2. **Stable variable references** — the plugin resolves "the data store" via a configured path (stored in `${CLAUDE_PLUGIN_DATA}` or a user-config file the onboarding skill writes), and resolves "the user" via `~/.claude/CLAUDE.md`. All plugin commands read from those references rather than hard-coding anything.
-3. **Forward compatibility** — because personalization lives in the user's data store (not in the plugin), new skills/commands can be added to the plugin in later versions without breaking existing users' setups.
-
-### Cross-device preference sync (open question)
-
-If a user wants their personalization to follow them across machines, the plugin itself shouldn't solve this — it's out of scope. Options the user can pick:
-- Version-control the data store in a private git repo.
-- Keep it in a synced cloud folder.
-- Maintain a user-owned private "preferences" repo/gist that the onboarding skill optionally pulls from.
-
-The plugin's responsibility ends at *reading* from a configured data-store path; *how* that path stays in sync across devices is a user concern.
-
-## Objective
-
-Go through my plugin marketplace with a view to refactoring again and consolidating according to this new pattern:
-
-1. Remove the "create new repository from template" plugin entirely.
-2. Break out each template that's subsumed into it back into its own plugin, as originally structured.
-3. Take the corresponding templates, where they existed, and nest them within those plugins.
-4. Delete the now-redundant standalone template repositories.
+This document is the prescriptive spec for refactoring Daniel's Claude Code plugin collection. Background, the original voice-typed task definition, and the review that led here are preserved in `docs/` and `inventory.md` / `clusters.md`.
 
 ---
 
-## Plan Review (grounded against Claude Code docs in `docs/`)
+## 1. The target pattern
 
-### What the docs confirm
+Every workspace-oriented plugin in the marketplace follows this shape:
 
-1. **The plan correctly separates primitives from data.** Today, New-Repo-From-Template provisions a workspace whose `.claude/` directory holds the slash commands / skills / subagents — so those primitives are **project-scoped** (only active when cwd is inside the provisioned repo). Breaking each domain out into its own plugin makes the primitives **global** (installed once via the marketplace, available from any cwd), while the plugin's provisioning skill still lays down a **data/context scaffold** wherever the user wants it on disk. That's the "best of both worlds" — the primitives detach from the data directory, which is exactly what the plugin model is built for.
+```
+<plugin-repo>/
+  .claude-plugin/
+    plugin.json
+  skills/
+    new-workspace/
+      SKILL.md              # provisioning skill
+    <primitive-skills>/     # domain primitives, globally available
+  commands/                 # optional domain commands
+  agents/                   # optional domain subagents
+  template/
+    CLAUDE.md               # scaffold for the provisioned workspace
+    README.md
+    context/
+    outputs/
+  README.md
+```
 
-2. **Bundling a scaffold as data inside a plugin is supported.** Plugins are copied to `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/` at install time. Bundled template files ride along.
+### Responsibilities
 
-3. **The right variable for a provisioning skill is `${CLAUDE_PLUGIN_ROOT}`**, not `${CLAUDE_SKILL_DIR}`. `CLAUDE_SKILL_DIR` points at the skill's own subdirectory (e.g. `<plugin>/skills/provision/`); `CLAUDE_PLUGIN_ROOT` points at the plugin root, which is where you'd stash the scaffold (e.g. `<plugin>/template/`). Use `CLAUDE_PLUGIN_ROOT` in hooks and MCP configs. In skill bash injection (`` !`cmd` ``), `CLAUDE_PLUGIN_ROOT` is only exported in hooks/MCP contexts — from a skill, walk up from `${CLAUDE_SKILL_DIR}/..` instead, or keep the template inside the skill folder.
+- **Primitives** (`skills/`, `commands/`, `agents/`) — installed globally from the marketplace, reachable from **any** cwd. They hold the reusable behavior (e.g. a VAD skill in the `media-production` plugin). They never live inside a provisioned workspace.
+- **Scaffold** (`template/`) — a plain data scaffold shipped as plugin data. No `.claude/` tree. Copied into the user's target path when they invoke `new-workspace`.
+- **Provisioning skill** (`skills/new-workspace/SKILL.md`) — takes a target path + workspace name + optional sub-variant. Copies the scaffold, personalizes CLAUDE.md using facts from `~/.claude/CLAUDE.md`, optionally creates a GitHub repo via `gh`.
+- **User data** lives in the provisioned workspace. Plugin updates never overwrite it.
 
-4. **`${CLAUDE_PLUGIN_DATA}` is the correct home for user data** that must survive plugin updates. Good fit for your "seamless cross-device" goal — but note that cross-device sync of that directory is your problem, not Claude Code's. The docs don't promise any sync.
+### Invariants
 
-5. **Private marketplaces work.** Host on a private GitHub repo, users set `GITHUB_TOKEN`/`GH_TOKEN` for auto-updates. You already have `danielrosehill-private`. The "private marketplace is painful" framing is less true than it was; the main friction is token management on new machines.
+- Plugins published to the public marketplace contain **no** Daniel-specific paths, hostnames, or identifiers. Personalization happens at `new-workspace` time by reading user memory.
+- The `template/` directory **must not** contain a `.claude/` subdirectory. If it did, those duplicates would shadow the plugin's globals and recreate the fusion problem we're solving (see `docs/usage-example.md` — the VAD pain point).
+- Resolve the bundled scaffold from a skill via `${CLAUDE_SKILL_DIR}/../../template`. `${CLAUDE_PLUGIN_ROOT}` is only exported in hooks/MCP contexts, not in skill bash injection.
+- Marketplace entries use `strict: true` (default). Each plugin's own `plugin.json` is authoritative.
 
-### Where the plan is sound
+### Provisioning skill contract
 
-- Consolidating each (plugin + scaffold) pair into a single plugin is directly supported and is the idiomatic pattern the docs imply for packaging context-heavy workflows.
-- A `provision-workspace` skill with `disable-model-invocation: true` + `allowed-tools: Bash(mkdir *) Bash(cp *) Bash(git init *)` is the right shape.
-- Separating "template data bundled in plugin" from "user data in `${CLAUDE_PLUGIN_DATA}`" maps cleanly onto the docs.
-- Removing the umbrella "New-Repo-From-Template" plugin is reasonable once each template is self-contained.
+Every `new-workspace` skill:
 
-### Implication: the data scaffold should be minimal
+1. Accepts `$ARGUMENTS` as `<workspace-name> [<target-path>] [--variant=<name>] [--local-only]`.
+2. Default target path: `~/repos/github/my-repos/<workspace-name>`.
+3. Default: create a **public** GitHub repo via `gh repo create` and push. `--local-only` skips the remote.
+4. Reads `~/.claude/CLAUDE.md` to fill OS/locale/timezone/identity into the new workspace's CLAUDE.md.
+5. Prompts only for facts it can't infer.
+6. After provision, prints next-step hints (which plugin primitives apply, where to drop context files).
 
-Once primitives live in the plugin, the provisioned workspace is *just data* — CLAUDE.md, `context/`, `outputs/`, maybe a README. No `.claude/commands/`, no `.claude/agents/`, no `.claude/skills/` (those would shadow the plugin's globals and re-create the old problem). The provisioning skill should deliberately **not** copy any `.claude/` tree into the target. If you want per-workspace overrides, keep them as CLAUDE.md content, not as primitive duplicates.
+---
 
-### Concerns / things to decide before executing
+## 2. The refactor
 
-1. **What do you lose by removing New-Repo-From-Template?** It has discovery value — one place to list "all the workspace templates I have." After the split you'll want either:
-   - a single "meta" skill in each plugin that advertises what scaffold it provisions, plus a marketplace-level description convention, or
-   - a lightweight "catalog" plugin that only documents *which* other plugins provision which scaffolds (no templates nested).
-   Decide which before deleting the old plugin.
+### Decisions (locked)
 
-2. **Templates that were never plugins.** You said New-Repo-From-Template absorbed templates that were never shaped as plugins. For each of those, the split requires *creating a new plugin from scratch* to host the scaffold. That's more work than the plan implies. Candidates:
-   - Is the template substantial enough to justify a plugin (skills/agents/hooks)?
-   - Or is it just a scaffold with no behavior? → In that case a plugin is overkill; keep it as a standalone template repo and have the user `gh repo create --template` it. Don't force everything into the plugin shape.
+- **Consolidate by primitives, not framing.** Templates collapse into clusters defined by the primitives they'd share. See `clusters.md` for the full cluster-to-plugin map.
+- **Promote every behavior-bearing template** — either into a new cluster plugin, or by merging into an existing one per the cluster map.
+- **Demote** any existing plugin that's really just a scaffold (inventory found zero; none to demote).
+- **Keep as standalone template repo** only the ~11 pure scaffolds with no behavior (`TEMPLATE_SCAFFOLD_ONLY` in `inventory.md`).
+- **Delete** absorbed template repos immediately after their cluster plugin is published and verified locally. No cooling period.
+- **Public scope only** — this reshape covers the public `danielrosehill` marketplace. Private plugins are out of scope for this repo.
+- **QA dedup** — the `qa-team` plugin absorbs the `Claude-QA-Team` scaffold. Old template repo deleted.
 
-3. **Don't delete the standalone template repos yet.** Step 4 is a one-way action. Suggest: after each plugin is published and validated with `claude plugin validate`, archive (not delete) the old template repo for 30 days before removing. Also check: are any of them referenced by existing private repos created from the template? GitHub's "created from template" link persists but isn't load-bearing.
+### Target plugin count
 
-4. **Version/update story for bundled scaffolds.** When you update the bundled template in the plugin, users who already provisioned a workspace won't get the update (by design — user data). You may want a `resync-workspace` skill that diffs the bundled scaffold against a provisioned workspace and offers to pull specific files forward.
+**27 cluster plugins + 1 standalone** (`hp5200-printer`) — see `clusters.md` for the definitive map. Replaces today's 21 scattered plugins + 111 template repos. A small residual set of plain template repos survives for pure scaffolds (per `inventory.md`).
 
-5. **Naming collision.** Plugin skills are namespaced as `/plugin-name:skill-name`. If every plugin gets a `provision` skill, it becomes `/home-assistant-manager:provision`, `/desktop-manager:provision`, etc. Fine, but pick the skill name deliberately — something like `new-workspace` may read better than `provision`.
+---
 
-6. **`strict: false` in marketplace entries is a footgun.** Keep `strict: true` (default) and let each plugin's own `plugin.json` be authoritative. The consolidation doesn't require strict mode changes.
+## 3. Execution order
 
-### Suggested execution order (revised)
+All conversions follow this sequence. Batch-run across clusters.
 
-1. Pick **one** plugin from the current set (e.g. Home-Assistant-Manager) as the pilot.
-2. Add the scaffold into the plugin as a `template/` directory.
-3. Add a `skills/new-workspace/SKILL.md` using `${CLAUDE_SKILL_DIR}/../../template` + `$ARGUMENTS` for target path.
-4. Validate: `claude plugin validate .` → bump version → publish via marketplace → install fresh on a second machine → provision from a random cwd. Confirm fluidity problem is actually gone.
-5. Only once that works end-to-end, repeat for the rest.
-6. For templates-that-were-never-plugins, decide per-item: promote to plugin vs. keep as standalone template repo.
-7. Remove New-Repo-From-Template last. Leave old template repos archived for a cooling period.
+### Per-cluster conversion (repeat for each of the 18 clusters)
 
-### Open questions for you
+1. **Read the cluster entry in `clusters.md`** — pick the target plugin repo (new or existing), the templates to absorb, sub-variants.
+2. **Scaffold or locate the plugin repo** at `~/repos/github/my-repos/<plugin-name>/`:
+   - If extending an existing plugin, branch off its current state.
+   - If creating new, scaffold: `.claude-plugin/plugin.json`, `README.md`, `skills/new-workspace/SKILL.md`, `template/` dir.
+3. **Promote primitives** — copy skills/commands/agents from the source templates into the plugin's top-level `skills/`, `commands/`, `agents/`. Deduplicate near-identical primitives; one authoritative version per plugin.
+4. **Assemble the scaffold** — merge the per-template scaffold content (CLAUDE.md text, context/ structure, README) into `template/`. Where sub-variants differ, keep variant-specific files under `template/variants/<variant>/`.
+5. **Write the `new-workspace` skill** — per the contract in §1. Include `disable-model-invocation: true` and `allowed-tools: Bash(mkdir *), Bash(cp *), Bash(git init *), Bash(gh repo create *), Bash(git push *)`.
+6. **Validate** locally: `claude plugin validate .`.
+7. **Bump version** in `plugin.json` and commit. Push to GitHub.
+8. **Record** absorbed template repos in the conversion log (`conversion-log.md` — to be created).
+9. **Delete** absorbed template repos (both GitHub and local clone) — only after successful validation and local install.
 
-- Is there a preferred location for provisioned workspaces (`~/repos/github/my-repos/`?) that the skill should default to, or always prompt?
-- Should each plugin's provisioner also offer to create the GitHub repo (using `gh`)?
-- What's the granularity for which templates become plugins vs stay as template repos? Rough rule: "has any Claude behavior attached" → plugin; "pure folder scaffold" → template repo.
+### Marketplace update (after all clusters are converted)
 
+1. Remove `new-repo-from-template` from `marketplace.json`.
+2. Add any newly-created cluster plugins.
+3. Bump versions for extended existing plugins.
+4. Commit + push `Claude-Code-Plugins`.
+
+### Local refresh
+
+1. On this workstation, `claude plugin update` (or equivalent) so the new cluster plugins are installed/refreshed.
+2. Smoke-test at least one `new-workspace` skill from `~` to confirm the VAD-style pain point is resolved.
+
+### Index update
+
+1. Update `~/repos/github/my-repos/Claude-Code-Repos-Index/` — remove entries for deleted template repos, add entries for new cluster plugins, update counts.
+2. Commit + push.
+
+### Retire New-Repo-From-Template
+
+1. After all clusters are live and the index is updated, archive (not delete) `New-Repo-From-Template-Plugin` on GitHub as historical reference. The plugin is removed from the marketplace but the repo persists read-only.
+
+---
+
+## 4. Open items to resolve before execution
+
+These are not blockers for clustering but must be decided before step 3 per-cluster conversion starts:
+
+- **Default workspace location.** Locked: `~/repos/github/my-repos/<workspace-name>`. Skill accepts an override.
+- **GH repo creation by default?** Locked: yes, public, with `--local-only` opt-out.
+- **Sub-variant argument syntax.** `$ARGUMENTS` parsed with the first token as workspace name, subsequent tokens as flags. Variants passed as `--variant=<name>`.
+- **Naming collisions** across plugins. Every plugin's provisioning skill is named `new-workspace`; accessed as `/<plugin-name>:new-workspace`. No collision risk.
+
+---
+
+## 5. Task handoff
+
+Per Daniel's request: after this plan, individual conversion tasks are handed out one at a time. The task list reflects this — see `TaskList` for the per-cluster tickets once spawned.
